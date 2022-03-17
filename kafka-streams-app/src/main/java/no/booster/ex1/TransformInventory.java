@@ -17,7 +17,18 @@ public class TransformInventory {
 		// Exercise 1: Transform stream of Debezium records
 		// Input: Stream of records from Debezium
 		// Output: Stream of Book records, with bookId as key (key: bookId, value: Book)
-		throw new RuntimeException("Not implemented yet!");
+		return books -> books.map((k, v) -> new KeyValue<>(k.getIsbn().toString(), transformBook(k, v)));
+	}
+
+	private Book transformBook(no.booster.inventory.book.Key k, no.booster.inventory.book.Envelope v) {
+		if (v == null || v.getAfter() == null) return null;
+		return Book.newBuilder()
+				.setIsbn(k.getIsbn())
+				.setTitle(v.getAfter().getTitle())
+				.setDescription(v.getAfter().getDescription())
+				.setAuthorId(v.getAfter().getAuthorId())
+				.setThumbnail(v.getAfter().getThumbnail())
+				.build();
 	}
 
 	@Bean

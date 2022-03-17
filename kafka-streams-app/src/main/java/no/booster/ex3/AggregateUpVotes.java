@@ -18,8 +18,14 @@ public class AggregateUpVotes {
 		// Input 0: Book projections (key: bookId, value: BookProjection)
 		// Input 1: Up-votes (key: bookId, value: UpVote)
 		// Output: Stream of BookProjection records, with up-vote count (key: bookId, value: BookProjection)
-//		throw new RuntimeException("Not implemented yet!");
-		return null;
+		return (books, upVotes) -> books
+				.leftJoin(upVotes.groupByKey().count(), this::withKarma)
+				.toStream();
 	}
 
+	private BookProjection withKarma(BookProjection book, Long karma) {
+		return BookProjection.newBuilder(book)
+				.setUpVotes(karma)
+				.build();
+	}
 }
